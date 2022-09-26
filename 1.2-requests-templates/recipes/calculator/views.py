@@ -31,6 +31,7 @@ DATA = {
 #   }
 # }
 
+
 def recipte(request):
     return render(request, 'calculator/recipe.html')
 
@@ -45,8 +46,6 @@ def calculator(request, recipte):
                 coun = {f'{key}': f'{val * int(servings)}'}
                 count.update(coun)
             context = {'recipe': count}
-
-
     return render(request, 'calculator/index.html', context)
 
 
