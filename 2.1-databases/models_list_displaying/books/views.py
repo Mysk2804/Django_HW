@@ -1,7 +1,7 @@
 from django.shortcuts import render
+from django.core.paginator import Paginator
 
 from books.models import Book
-
 
 
 def books_view(request):
@@ -12,16 +12,25 @@ def books_view(request):
     }
     return render(request, template, context)
 
-def book_title(request, slug):
-    template = 'books/books_title.html'
-    all_books = Book.objects.all()
-    bookу = ''
-    for book in all_books:
-        if str(book.pub_date) == slug:
-            bookу = book
+
+def book_view(request, date):
+
+    book = Book.objects.all()
+    paginator = Paginator(book, 1)
+    current_page = request.GET.get('page', 1)
+    page_obj = paginator.get_page(current_page)
+    data = page_obj.object_list
+
+    prev_page_url, next_page_url = None, None
+    if page_obj.has_previous():
+        prev_page_url = page_obj.previous_page_number()
+    if page_obj.has_next():
+        next_page_url = page_obj.next_page_number()
+    template = 'books/book.html'
     context = {
-        'book': bookу,
-        'page': all_books
+        'book': data,
+        'current_page': page_obj.number,
+        'prev_page_url': prev_page_url,
+        'next_page_url': next_page_url
     }
     return render(request, template, context)
-
