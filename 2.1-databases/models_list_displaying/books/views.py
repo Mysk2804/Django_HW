@@ -14,7 +14,6 @@ def books_view(request):
 
 
 def book_view(request, date):
-
     book = Book.objects.all()
     paginator = Paginator(book, 1)
     current_page = request.GET.get('page', 1)
