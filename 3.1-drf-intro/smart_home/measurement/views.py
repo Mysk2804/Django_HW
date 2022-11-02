@@ -12,8 +12,11 @@ class SensorView(ListCreateAPIView):
 
 
 class MetaView(RetrieveUpdateAPIView):
-    queryset = Sensor.objects.all()
+    # queryset = Sensor.objects.all()
     serializer_class = SensorDetailSerializer
+
+    def get_queryset(self):
+        return Sensor.objects.all()
 
 
 class NewTemp(CreateAPIView):

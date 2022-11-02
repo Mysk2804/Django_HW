@@ -12,7 +12,7 @@ class Sensor(models.Model):
 
 
 class Measurement(models.Model):
-    id_sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE)
+    id_sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name='measurements')
     temperature = models.CharField(max_length=100)
     created_at = models.DateField(auto_now=True)
 
