@@ -1,18 +1,26 @@
 from rest_framework import serializers
 
+from logistic.models import Product, Stock, StockProduct
+
 
 class ProductSerializer(serializers.ModelSerializer):
-    # настройте сериализатор для продукта
-    pass
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'description']
 
 
 class ProductPositionSerializer(serializers.ModelSerializer):
-    # настройте сериализатор для позиции продукта на складе
-    pass
+    class Meta:
+        model = StockProduct
+        fields = ['product', 'quantity', 'price']
 
 
 class StockSerializer(serializers.ModelSerializer):
     positions = ProductPositionSerializer(many=True)
+
+    class Meta:
+        model = Stock
+        fields = ['address', 'products', 'positions']
 
     # настройте сериализатор для склада
 
@@ -26,6 +34,13 @@ class StockSerializer(serializers.ModelSerializer):
         # здесь вам надо заполнить связанные таблицы
         # в нашем случае: таблицу StockProduct
         # с помощью списка positions
+        for position in positions:
+            StockProduct.objects.create(
+                stock=stock,
+                product=position['product'],
+                quantity=position['quantity'],
+                price=position['price'],
+            ).save()
 
         return stock
 
@@ -40,4 +55,22 @@ class StockSerializer(serializers.ModelSerializer):
         # в нашем случае: таблицу StockProduct
         # с помощью списка positions
 
+        for position in positions:
+            # если product с номером для обновления есть на складе, обновляем
+            stock_product = StockProduct.objects.filter(product=position['product'])
+            if stock_product:
+                stock_product.update(
+                    stock=stock,
+                    product=position['product'],
+                    quantity=position['quantity'],
+                    price=position['price'],
+                )
+            else:
+                # если нет добавляем
+                StockProduct.objects.create(
+                    stock=stock,
+                    product=position['product'],
+                    quantity=position['quantity'],
+                    price=position['price'],
+                ).save()
         return stock
