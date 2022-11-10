@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from django import forms
 
 from advertisements.models import Advertisement
 
@@ -41,5 +42,13 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         """Метод для валидации. Вызывается при создании и обновлении."""
 
         # TODO: добавьте требуемую валидацию
+        adv_obj = Advertisement.objects.filter(creator=self.context["request"].user)
+        adv_open = list(adv.status for adv in adv_obj if adv.status in ["OPEN", "Открыто"])
 
-        return data
+        if data.get('status') in ["CLOSED", "Закрыто"]:
+            return data
+        elif len(adv_open) < 10:
+            return data
+        else:
+            raise forms.ValidationError('Maximum open ads reached!')
+
