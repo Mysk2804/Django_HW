@@ -74,3 +74,4 @@ class StockSerializer(serializers.ModelSerializer):
                     price=position['price'],
                 ).save()
         return stock
+
